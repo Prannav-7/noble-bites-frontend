@@ -9,7 +9,9 @@ export const products = [
     ingredients: "Rice Flour, Urad Dal Flour, Butter, Cumin Seeds, Asafoetida, Oil",
     shelfLife: "30 Days",
     weight: "250g",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 50
   },
   {
     id: 2,
@@ -21,7 +23,9 @@ export const products = [
     ingredients: "Rice Flour, Roasted Gram, Red Chilli Powder, Curry Leaves, Oil",
     shelfLife: "25 Days",
     weight: "200g",
-    rating: 4
+    rating: 4,
+    inStock: true,
+    stockQuantity: 35
   },
   {
     id: 3,
@@ -33,7 +37,9 @@ export const products = [
     ingredients: "Rice Flour, Urad Dal, Coconut, Butter, Sesame Seeds",
     shelfLife: "45 Days",
     weight: "250g",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 42
   },
   {
     id: 4,
@@ -45,7 +51,9 @@ export const products = [
     ingredients: "Gram Flour, Rice Flour, Carom Seeds (Omam), Butter, Oil",
     shelfLife: "20 Days",
     weight: "150g",
-    rating: 4
+    rating: 4,
+    inStock: true,
+    stockQuantity: 8
   },
   {
     id: 5,
@@ -57,7 +65,9 @@ export const products = [
     ingredients: "Gram Flour, Peanuts, Fried Gram, Curry Leaves, Red Chilli",
     shelfLife: "30 Days",
     weight: "400g",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 25
   },
   {
     id: 6,
@@ -69,7 +79,9 @@ export const products = [
     ingredients: "Gram Flour, Rice Flour, Onion, Green Chillies, Ginger, Oil",
     shelfLife: "15 Days",
     weight: "250g",
-    rating: 4
+    rating: 4,
+    inStock: true,
+    stockQuantity: 30
   },
   {
     id: 7,
@@ -81,7 +93,9 @@ export const products = [
     ingredients: "Raw Rice, Jaggery, Cardamom, Dry Ginger Powder, Ghee",
     shelfLife: "10 Days",
     weight: "5 pcs",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 20
   },
   {
     id: 8,
@@ -93,7 +107,9 @@ export const products = [
     ingredients: "Urad Dal, Sugar Syrup, Rose Essence, Food Color, Oil",
     shelfLife: "5 Days",
     weight: "200g",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 15
   },
   {
     id: 9,
@@ -105,7 +121,9 @@ export const products = [
     ingredients: "Gram Flour (Besan), Sugar, Pure Ghee",
     shelfLife: "15 Days",
     weight: "250g",
-    rating: 5
+    rating: 5,
+    inStock: true,
+    stockQuantity: 40
   },
   {
     id: 10,
@@ -117,6 +135,8 @@ export const products = [
     ingredients: "Gram Flour, Sugar, Ghee, Cashews, Raisins, Cardamom",
     shelfLife: "15 Days",
     weight: "6 pcs",
-    rating: 4
+    rating: 4,
+    inStock: true,
+    stockQuantity: 50
   }
 ];

@@ -15,6 +15,9 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
     const [wishlist, setWishlist] = useState([]);
 
+    // Helper function to get product ID (handles both _id and id)
+    const getProductId = (product) => product._id || product.id;
+
     // Load cart and wishlist from localStorage on mount
     useEffect(() => {
         const savedCart = localStorage.getItem('cart');
@@ -39,13 +42,14 @@ export const CartProvider = ({ children }) => {
     }, [wishlist]);
 
     const addToCart = (product, quantity = 1) => {
-        const existingItem = cartItems.find(item => item.id === product.id);
+        const productId = getProductId(product);
+        const existingItem = cartItems.find(item => getProductId(item) === productId);
 
         if (existingItem) {
             // Update quantity if item already exists
             setCartItems(prevItems =>
                 prevItems.map(item =>
-                    item.id === product.id
+                    getProductId(item) === productId
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 )
@@ -59,7 +63,7 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromCart = (productId) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+        setCartItems(prevItems => prevItems.filter(item => getProductId(item) !== productId));
         toast.success('Removed from cart');
     };
 
@@ -71,7 +75,7 @@ export const CartProvider = ({ children }) => {
 
         setCartItems(prevItems =>
             prevItems.map(item =>
-                item.id === productId ? { ...item, quantity } : item
+                getProductId(item) === productId ? { ...item, quantity } : item
             )
         );
     };
@@ -91,8 +95,9 @@ export const CartProvider = ({ children }) => {
 
     // Wishlist Functions
     const addToWishlist = (product) => {
+        const productId = getProductId(product);
         setWishlist(prevWishlist => {
-            const exists = prevWishlist.find(item => item.id === product.id);
+            const exists = prevWishlist.find(item => getProductId(item) === productId);
             if (exists) {
                 toast.error('Already in wishlist');
                 return prevWishlist;
@@ -103,12 +108,12 @@ export const CartProvider = ({ children }) => {
     };
 
     const removeFromWishlist = (productId) => {
-        setWishlist(prevWishlist => prevWishlist.filter(item => item.id !== productId));
+        setWishlist(prevWishlist => prevWishlist.filter(item => getProductId(item) !== productId));
         toast.success('Removed from wishlist');
     };
 
     const isInWishlist = (productId) => {
-        return wishlist.some(item => item.id === productId);
+        return wishlist.some(item => getProductId(item) === productId);
     };
 
     const getWishlistCount = () => {

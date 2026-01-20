@@ -8,7 +8,7 @@ import {
     Package,
     ShoppingCart,
     Users,
-    DollarSign,
+    IndianRupee,
     TrendingUp,
     AlertCircle,
     Plus,
@@ -136,6 +136,11 @@ const AdminDashboard = () => {
         try {
             await axios.delete(`http://localhost:5000/api/admin/products/${productId}`, getAuthHeaders());
             toast.success('Product deleted successfully');
+
+            // Immediately remove from state for instant UI update
+            setProducts(products.filter(p => p._id !== productId));
+
+            // Also refresh dashboard data
             fetchDashboardData();
         } catch (error) {
             console.error('Delete product error:', error);
@@ -256,9 +261,9 @@ const AdminDashboard = () => {
                         {/* Stats Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <StatCard
-                                icon={DollarSign}
+                                icon={IndianRupee}
                                 title="Total Revenue"
-                                value={`₹${stats.totalRevenue.toLocaleString()}`}
+                                value={`₹${(stats?.totalRevenue || 0).toLocaleString('en-IN')}`}
                                 color="bg-green-500"
                             />
                             <StatCard
@@ -404,7 +409,7 @@ const AdminDashboard = () => {
                                                             {product.stockQuantity}
                                                         </span>
                                                     </td>
-                                                    <td className="px-4 py-3">⭐ {product.rating.toFixed(1)}</td>
+                                                    <td className="px-4 py-3">⭐ {(product.rating || 0).toFixed(1)}</td>
                                                     <td className="px-4 py-3">
                                                         <div className="flex gap-2">
                                                             <button

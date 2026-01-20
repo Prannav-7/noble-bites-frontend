@@ -13,7 +13,8 @@ const ProductDetailsPage = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const product = products.find(p => p.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
@@ -29,6 +30,44 @@ const ProductDetailsPage = () => {
 
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart();
   const { isAuthenticated, user } = useAuth();
+
+  // Fetch product from database
+  useEffect(() => {
+    fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/products');
+
+      if (response.data && response.data.length > 0) {
+        // Find product in database products
+        const foundProduct = response.data.find(p =>
+          p._id === id || p.id === parseInt(id) || p.id === id
+        );
+
+        if (foundProduct) {
+          setProduct(foundProduct);
+        } else {
+          // Fallback to static products
+          const staticProduct = products.find(p => p.id === parseInt(id));
+          setProduct(staticProduct);
+        }
+      } else {
+        // Fallback to static products if DB is empty
+        const staticProduct = products.find(p => p.id === parseInt(id));
+        setProduct(staticProduct);
+      }
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      // Fallback to static products on error
+      const staticProduct = products.find(p => p.id === parseInt(id));
+      setProduct(staticProduct);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (product && isAuthenticated()) {
@@ -84,6 +123,18 @@ const ProductDetailsPage = () => {
 
   const fetchRelatedProducts = async () => {
     try {
+      // Fetch all products from database
+      const productsResponse = await axios.get('http://localhost:5000/api/products');
+      let allProducts = [];
+
+      if (productsResponse.data && productsResponse.data.length > 0) {
+        allProducts = productsResponse.data;
+      } else {
+        allProducts = products; // Fallback to static products
+      }
+
+      const currentProductId = product._id || product.id;
+
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
         const response = await axios.get('http://localhost:5000/api/orders/my-orders', {
@@ -102,32 +153,37 @@ const ProductDetailsPage = () => {
           });
 
           // Find related products based on category and purchased history
-          const related = products.filter(p =>
-            p.id !== parseInt(id) &&
-            (p.category === product.category || purchasedProductIds.has(p.id.toString()))
-          ).slice(0, 4);
+          const related = allProducts.filter(p => {
+            const pId = p._id || p.id;
+            return pId !== currentProductId &&
+              (p.category === product.category || purchasedProductIds.has(pId?.toString()));
+          }).slice(0, 4);
 
           setRelatedProducts(related);
         } else {
           // Default: show products from same category
-          const related = products.filter(p =>
-            p.id !== parseInt(id) && p.category === product.category
-          ).slice(0, 4);
+          const related = allProducts.filter(p => {
+            const pId = p._id || p.id;
+            return pId !== currentProductId && p.category === product.category;
+          }).slice(0, 4);
           setRelatedProducts(related);
         }
       } else {
         // Default: show products from same category
-        const related = products.filter(p =>
-          p.id !== parseInt(id) && p.category === product.category
-        ).slice(0, 4);
+        const related = allProducts.filter(p => {
+          const pId = p._id || p.id;
+          return pId !== currentProductId && p.category === product.category;
+        }).slice(0, 4);
         setRelatedProducts(related);
       }
     } catch (error) {
       console.error('Error fetching related products:', error);
-      // Fallback to category-based related products
-      const related = products.filter(p =>
-        p.id !== parseInt(id) && p.category === product.category
-      ).slice(0, 4);
+      // Fallback to category-based related products from static data
+      const currentProductId = product._id || product.id;
+      const related = products.filter(p => {
+        const pId = p._id || p.id;
+        return pId !== currentProductId && p.category === product.category;
+      }).slice(0, 4);
       setRelatedProducts(related);
     }
   };
@@ -176,6 +232,16 @@ const ProductDetailsPage = () => {
     }
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-brand-text">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary mb-4"></div>
+        <p className="text-brand-text/60">Loading product...</p>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-brand-text">
@@ -187,7 +253,7 @@ const ProductDetailsPage = () => {
     );
   }
 
-  const isWishlisted = isInWishlist(product.id);
+  const isWishlisted = isInWishlist(product._id || product.id);
 
   const handleAuthRequired = (action) => {
     if (!isAuthenticated()) {
@@ -291,7 +357,7 @@ const ProductDetailsPage = () => {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex items-center text-yellow-400">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={18} fill={i < product.rating ? "currentColor" : "none"} className={i < product.rating ? "text-yellow-400" : "text-gray-300"} />
+                        <Star key={`product-rating-${i}`} size={18} fill={i < product.rating ? "currentColor" : "none"} className={i < product.rating ? "text-yellow-400" : "text-gray-300"} />
                       ))}
                     </div>
                     <span className="text-brand-text/60 text-sm">({reviews.length} reviews)</span>
@@ -316,6 +382,28 @@ const ProductDetailsPage = () => {
                       <Clock size={14} /> {product.shelfLife}
                     </p>
                   </div>
+                </div>
+
+                {/* Stock Availability */}
+                <div className="flex items-center gap-2 py-2">
+                  <span className="text-sm font-semibold text-brand-text">Availability:</span>
+                  {product.inStock && product.stockQuantity > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${product.stockQuantity < 10
+                        ? 'bg-orange-100 text-orange-700'
+                        : 'bg-green-100 text-green-700'
+                        }`}>
+                        {product.stockQuantity < 10 ? 'Low Stock' : 'In Stock'}
+                      </span>
+                      <span className="text-sm text-brand-text/70">
+                        ({product.stockQuantity} units available)
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                      Out of Stock
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-6">
@@ -436,7 +524,7 @@ const ProductDetailsPage = () => {
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
-                        key={star}
+                        key={`review-star-${star}`}
                         type="button"
                         onClick={() => setReviewForm({ ...reviewForm, rating: star })}
                         className="focus:outline-none"
@@ -502,7 +590,7 @@ const ProductDetailsPage = () => {
                             <div className="flex items-center">
                               {[...Array(5)].map((_, i) => (
                                 <Star
-                                  key={i}
+                                  key={`review-${review._id}-star-${i}`}
                                   size={14}
                                   className={i < review.rating ? "text-yellow-400" : "text-gray-300"}
                                   fill={i < review.rating ? "currentColor" : "none"}
@@ -539,33 +627,36 @@ const ProductDetailsPage = () => {
                 {isAuthenticated() ? 'You May Also Like' : 'Related Products'}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((relatedProduct) => (
-                  <Link
-                    key={relatedProduct.id}
-                    to={`/product/${relatedProduct.id}`}
-                    className="bg-white/50 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg border border-white/40 hover:shadow-2xl transition-all group"
-                  >
-                    <div className="aspect-square overflow-hidden">
-                      <img
-                        src={relatedProduct.image}
-                        alt={relatedProduct.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-bold text-brand-text mb-1 group-hover:text-brand-primary transition-colors">
-                        {relatedProduct.name}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <span className="text-brand-primary font-bold">Rs. {relatedProduct.price}</span>
-                        <div className="flex items-center text-yellow-400">
-                          <Star size={14} fill="currentColor" />
-                          <span className="text-xs text-brand-text/60 ml-1">{relatedProduct.rating}</span>
+                {relatedProducts.map((relatedProduct) => {
+                  const productId = relatedProduct._id || relatedProduct.id;
+                  return (
+                    <Link
+                      key={productId}
+                      to={`/product/${productId}`}
+                      className="bg-white/50 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg border border-white/40 hover:shadow-2xl transition-all group"
+                    >
+                      <div className="aspect-square overflow-hidden">
+                        <img
+                          src={relatedProduct.image}
+                          alt={relatedProduct.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-bold text-brand-text mb-1 group-hover:text-brand-primary transition-colors">
+                          {relatedProduct.name}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <span className="text-brand-primary font-bold">Rs. {relatedProduct.price}</span>
+                          <div className="flex items-center text-yellow-400">
+                            <Star size={14} fill="currentColor" />
+                            <span className="text-xs text-brand-text/60 ml-1">{relatedProduct.rating}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
           )}

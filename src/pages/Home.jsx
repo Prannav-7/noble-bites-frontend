@@ -1,13 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin, Phone, Mail, Instagram, Facebook, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import { products as fallbackProducts } from '../data/products';
+import axios from 'axios';
 
 const Home = () => {
-  // Select top 4 products for featured section
-  const featuredProducts = products.slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/products');
+      console.log('Fetched products:', response.data);
+
+      if (response.data && response.data.length > 0) {
+        // Use database products - take first 4
+        const featured = response.data.slice(0, 4);
+        console.log('Using database products:', featured);
+        setFeaturedProducts(featured);
+      } else {
+        // Fallback to static products
+        console.log('Using fallback products');
+        setFeaturedProducts(fallbackProducts.slice(0, 4));
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      // Fallback to static products
+      console.log('Error occurred, using fallback products');
+      setFeaturedProducts(fallbackProducts.slice(0, 4));
+    }
+  };
 
   return (
     <div className="w-full overflow-x-hidden">
@@ -120,7 +147,7 @@ const Home = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product._id || product.id} product={product} />
             ))}
           </div>
 
@@ -128,6 +155,84 @@ const Home = () => {
             <Link to="/menu" className="inline-flex items-center gap-2 border-2 border-brand-primary text-brand-primary font-bold py-3 px-8 rounded-full hover:bg-brand-primary hover:text-white transition-all">
               View Full Menu <ArrowRight size={20} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 px-4 bg-brand-bg">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-[#EBC7C7] rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden">
+            {/* Decorative header */}
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-4xl font-bold text-brand-text inline-block border-b-2 border-brand-text pb-2">Contact Us</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12">
+              {/* Contact Info */}
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <h3 className="font-heading text-2xl font-bold text-brand-primary mb-6">Location</h3>
+
+                  <div className="flex items-start gap-3 text-brand-text font-medium">
+                    <MapPin className="mt-1 text-brand-primary" />
+                    <div>
+                      <p>Ranipet District - 631102</p>
+                      <p>Coimbatore District - 641402</p>
+                      <p>Chennai District - 600001</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-brand-text font-medium">
+                    <Phone className="text-brand-primary" />
+                    <p>+91 9488110405</p>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-brand-text font-medium">
+                    <Mail className="text-brand-primary" />
+                    <p>logeshofficial333@gmail.com</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-heading text-xl font-bold text-brand-text mb-4">Follow us</h3>
+                  <div className="flex gap-4">
+                    {[
+                      { Icon: Instagram, name: 'instagram' },
+                      { Icon: Facebook, name: 'facebook' },
+                      { Icon: Youtube, name: 'youtube' }
+                    ].map(({ Icon, name }) => (
+                      <a key={name} href="#" className="w-10 h-10 bg-brand-text text-white rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors">
+                        <Icon size={20} />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Form */}
+              <form className="space-y-4 bg-white/30 p-6 rounded-2xl backdrop-blur-sm">
+                <input
+                  type="text"
+                  placeholder="Enter Your Name:"
+                  className="w-full px-4 py-3 rounded-lg bg-white/80 border-none focus:ring-2 focus:ring-brand-primary outline-none placeholder:text-gray-500"
+                />
+                <input
+                  type="email"
+                  placeholder="Enter Your Gmail:"
+                  className="w-full px-4 py-3 rounded-lg bg-white/80 border-none focus:ring-2 focus:ring-brand-primary outline-none placeholder:text-gray-500"
+                />
+                <textarea
+                  rows="4"
+                  placeholder="Enter Your Message:"
+                  className="w-full px-4 py-3 rounded-lg bg-white/80 border-none focus:ring-2 focus:ring-brand-primary outline-none placeholder:text-gray-500 resize-none"
+                ></textarea>
+
+                <button className="w-full bg-brand-card hover:bg-brand-primary text-white font-bold py-3 rounded-full shadow-md transition-colors">
+                  Submit
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </section>

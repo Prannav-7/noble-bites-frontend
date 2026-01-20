@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, ShoppingCart, Heart, User, LogOut, Shield, Package, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -10,6 +10,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef(null);
   const location = useLocation();
   const { getCartCount, getWishlistCount } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
@@ -22,7 +23,25 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/#about' },
     { name: 'Menu', path: '/menu' },
+    { name: 'Contact', path: '/#contact' },
   ];
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   const handleLogout = () => {
     logout();
@@ -84,7 +103,6 @@ const Navbar = () => {
                   <button
                     onClick={() => setShowProfileDropdown(!showProfileDropdown)}
                     className="flex items-center gap-2 text-brand-text hover:text-brand-primary transition-colors font-medium"
-                    onBlur={() => setTimeout(() => setShowProfileDropdown(false), 200)}
                   >
                     <span>Hi, {user?.name || 'User'}</span>
                     <ChevronDown size={18} className={`transition-transform ${showProfileDropdown ? 'rotate-180' : ''}`} />
@@ -100,7 +118,9 @@ const Navbar = () => {
                       <Link
                         to="/my-orders"
                         className="flex items-center gap-2 px-4 py-2 hover:bg-brand-light transition-colors"
-                        onClick={() => setShowProfileDropdown(false)}
+                        onClick={() => {
+                          setShowProfileDropdown(false);
+                        }}
                       >
                         <Package size={18} className="text-brand-primary" />
                         <span>My Orders</span>
@@ -110,7 +130,9 @@ const Navbar = () => {
                         <Link
                           to="/admin"
                           className="flex items-center gap-2 px-4 py-2 hover:bg-brand-light transition-colors"
-                          onClick={() => setShowProfileDropdown(false)}
+                          onClick={() => {
+                            setShowProfileDropdown(false);
+                          }}
                         >
                           <Shield size={18} className="text-purple-600" />
                           <span>Admin Dashboard</span>
@@ -120,7 +142,10 @@ const Navbar = () => {
                       <hr className="my-2" />
 
                       <button
-                        onClick={handleLogout}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLogout();
+                        }}
                         className="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 transition-colors text-red-600"
                       >
                         <LogOut size={18} />

@@ -41,7 +41,7 @@ const CheckoutPage = () => {
       // Prepare order data matching backend schema
       const orderData = {
         items: cartItems.map(item => ({
-          product: item.id,
+          product: item._id || item.id, // Handle both database (_id) and static (id) products
           name: item.name,
           quantity: item.quantity,
           price: item.price,
@@ -248,7 +248,7 @@ const CheckoutPage = () => {
 
               <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-3 items-center bg-white/10 p-3 rounded-lg">
+                  <div key={item._id || item.id} className="flex gap-3 items-center bg-white/10 p-3 rounded-lg">
                     <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover bg-white" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-sm truncate">{item.name}</h3>

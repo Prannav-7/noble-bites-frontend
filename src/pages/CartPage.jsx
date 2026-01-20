@@ -63,57 +63,60 @@ const CartPage = () => {
 
         {/* Cart Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {cartItems.map((item) => (
-            <div key={item.id} className="bg-brand-card rounded-xl p-4 flex gap-4 shadow-lg text-white">
-              {/* Image */}
-              <div className="w-1/3 flex flex-col items-center justify-center">
-                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/30 mb-2 bg-white">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                </div>
-                <h3 className="font-heading font-bold text-lg text-center leading-tight">{item.name}</h3>
-                <div className="flex mt-1 text-yellow-400 text-xs">★★★★★</div>
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="mt-2 text-xs bg-white text-brand-primary px-3 py-1 rounded-full flex items-center gap-1 hover:bg-gray-100 transition-colors"
-                >
-                  <Trash2 size={10} /> Remove
-                </button>
-              </div>
-
-              {/* Details */}
-              <div className="w-2/3 flex flex-col justify-between py-2">
-                <div className="flex justify-between items-start">
-                  <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">Details</span>
-                </div>
-
-                <div className="space-y-1 text-xs md:text-sm opacity-90 mt-2">
-                  <p className="font-semibold">Price: Rs.{item.price}</p>
-                  <div className="flex items-center gap-2">
-                    <span>Quantity:</span>
-                    <div className="flex items-center gap-2 bg-white/20 rounded-lg px-2 py-1">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="hover:bg-white/20 rounded px-1"
-                      >
-                        <Minus size={12} />
-                      </button>
-                      <span className="w-8 text-center font-bold">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="hover:bg-white/20 rounded px-1"
-                      >
-                        <Plus size={12} />
-                      </button>
-                    </div>
+          {cartItems.map((item) => {
+            const itemId = item._id || item.id;
+            return (
+              <div key={itemId} className="bg-brand-card rounded-xl p-4 flex gap-4 shadow-lg text-white">
+                {/* Image */}
+                <div className="w-1/3 flex flex-col items-center justify-center">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/30 mb-2 bg-white">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
-                  <p className="font-semibold">Subtotal: Rs.{item.price * item.quantity}</p>
-                  <p>Free Delivery</p>
-                  <p>No Return Policy</p>
-                  <p>Cash On Delivery Available</p>
+                  <h3 className="font-heading font-bold text-lg text-center leading-tight">{item.name}</h3>
+                  <div className="flex mt-1 text-yellow-400 text-xs">★★★★★</div>
+                  <button
+                    onClick={() => removeFromCart(itemId)}
+                    className="mt-2 text-xs bg-white text-brand-primary px-3 py-1 rounded-full flex items-center gap-1 hover:bg-gray-100 transition-colors"
+                  >
+                    <Trash2 size={10} /> Remove
+                  </button>
+                </div>
+
+                {/* Details */}
+                <div className="w-2/3 flex flex-col justify-between py-2">
+                  <div className="flex justify-between items-start">
+                    <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">Details</span>
+                  </div>
+
+                  <div className="space-y-1 text-xs md:text-sm opacity-90 mt-2">
+                    <p className="font-semibold">Price: Rs.{item.price}</p>
+                    <div className="flex items-center gap-2">
+                      <span>Quantity:</span>
+                      <div className="flex items-center gap-2 bg-white/20 rounded-lg px-2 py-1">
+                        <button
+                          onClick={() => updateQuantity(itemId, item.quantity - 1)}
+                          className="hover:bg-white/20 rounded px-1"
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="w-8 text-center font-bold">{item.quantity}</span>
+                        <button
+                          onClick={() => updateQuantity(itemId, item.quantity + 1)}
+                          className="hover:bg-white/20 rounded px-1"
+                        >
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="font-semibold">Subtotal: Rs.{item.price * item.quantity}</p>
+                    <p>Free Delivery</p>
+                    <p>No Return Policy</p>
+                    <p>Cash On Delivery Available</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Cart Summary & Checkout */}
