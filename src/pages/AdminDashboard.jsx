@@ -33,6 +33,7 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
+import { API_ENDPOINTS, getImageUrl } from '../config/api';
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
 const ADMIN_EMAILS = ['prannavp803@gmail.com', 'ran17062005@gmail.com'];
@@ -92,15 +93,15 @@ const AdminDashboard = () => {
                 statusRes,
                 topRes
             ] = await Promise.all([
-                axios.get('http://localhost:5000/api/admin/dashboard/stats', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/products', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/orders/recent?limit=20', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/monthly-sales', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/weekly-sales', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/sales-by-category', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/sales-by-payment', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/order-status', getAuthHeaders()),
-                axios.get('http://localhost:5000/api/admin/analytics/top-products?limit=10', getAuthHeaders())
+                axios.get(API_ENDPOINTS.ADMIN_DASHBOARD_STATS, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_PRODUCTS, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_RECENT_ORDERS(20), getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_MONTHLY_SALES, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_WEEKLY_SALES, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_SALES_BY_CATEGORY, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_SALES_BY_PAYMENT, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_ORDER_STATUS_ANALYTICS, getAuthHeaders()),
+                axios.get(API_ENDPOINTS.ADMIN_TOP_PRODUCTS(10), getAuthHeaders())
             ]);
 
             setStats(statsRes.data.stats);
@@ -134,7 +135,7 @@ const AdminDashboard = () => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/admin/products/${productId}`, getAuthHeaders());
+            await axios.delete(API_ENDPOINTS.ADMIN_PRODUCT_BY_ID(productId), getAuthHeaders());
             toast.success('Product deleted successfully');
 
             // Immediately remove from state for instant UI update
@@ -152,14 +153,14 @@ const AdminDashboard = () => {
         try {
             if (selectedProduct) {
                 await axios.put(
-                    `http://localhost:5000/api/admin/products/${selectedProduct._id}`,
+                    API_ENDPOINTS.ADMIN_PRODUCT_BY_ID(selectedProduct._id),
                     productData,
                     getAuthHeaders()
                 );
                 toast.success('Product updated successfully');
             } else {
                 await axios.post(
-                    'http://localhost:5000/api/admin/products',
+                    API_ENDPOINTS.ADMIN_PRODUCTS,
                     productData,
                     getAuthHeaders()
                 );
@@ -178,7 +179,7 @@ const AdminDashboard = () => {
     const handleUpdateOrderStatus = async (orderId, newStatus) => {
         try {
             await axios.patch(
-                `http://localhost:5000/api/admin/orders/${orderId}/status`,
+                API_ENDPOINTS.ADMIN_ORDER_STATUS(orderId),
                 { orderStatus: newStatus },
                 getAuthHeaders()
             );
@@ -193,7 +194,7 @@ const AdminDashboard = () => {
     const fetchUserOrders = async (userId) => {
         try {
             const response = await axios.get(
-                `http://localhost:5000/api/admin/orders/user/${userId}`,
+                API_ENDPOINTS.ADMIN_USER_ORDERS(userId),
                 getAuthHeaders()
             );
             setUserOrders(response.data.orders);
@@ -727,7 +728,7 @@ const ProductModal = ({ product, onClose, onSave }) => {
 
             const token = localStorage.getItem('token');
             const response = await axios.post(
-                'http://localhost:5000/api/upload-image',
+                API_ENDPOINTS.UPLOAD_IMAGE,
                 formDataToSend,
                 {
                     headers: {
@@ -738,7 +739,7 @@ const ProductModal = ({ product, onClose, onSave }) => {
             );
 
             if (response.data.success) {
-                const imageUrl = `http://localhost:5000${response.data.imageUrl}`;
+                const imageUrl = getImageUrl(response.data.imageUrl);
                 setFormData({ ...formData, image: imageUrl });
                 toast.success('Image uploaded successfully!');
             }

@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import AuthModal from '../components/AuthModal';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -39,7 +40,7 @@ const ProductDetailsPage = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(API_ENDPOINTS.PRODUCTS);
 
       if (response.data && response.data.length > 0) {
         // Find product in database products
@@ -91,7 +92,7 @@ const ProductDetailsPage = () => {
   const fetchReviews = async () => {
     try {
       setLoadingReviews(true);
-      const response = await axios.get(`http://localhost:5000/api/reviews/product/${id}`);
+      const response = await axios.get(API_ENDPOINTS.PRODUCT_REVIEWS(id));
       if (response.data.success) {
         setReviews(response.data.reviews);
       }
@@ -105,7 +106,7 @@ const ProductDetailsPage = () => {
   const checkReviewEligibility = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/api/reviews/can-review/${id}`, {
+      const response = await axios.get(API_ENDPOINTS.CAN_REVIEW(id), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -124,7 +125,7 @@ const ProductDetailsPage = () => {
   const fetchRelatedProducts = async () => {
     try {
       // Fetch all products from database
-      const productsResponse = await axios.get('http://localhost:5000/api/products');
+      const productsResponse = await axios.get(API_ENDPOINTS.PRODUCTS);
       let allProducts = [];
 
       if (productsResponse.data && productsResponse.data.length > 0) {
@@ -137,7 +138,7 @@ const ProductDetailsPage = () => {
 
       if (isAuthenticated()) {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/orders/my-orders', {
+        const response = await axios.get(API_ENDPOINTS.MY_ORDERS, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -208,7 +209,7 @@ const ProductDetailsPage = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/reviews', {
+      const response = await axios.post(API_ENDPOINTS.REVIEWS, {
         product: id,
         rating: reviewForm.rating,
         comment: reviewForm.comment

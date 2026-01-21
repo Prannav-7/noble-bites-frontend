@@ -15,6 +15,7 @@ import {
     Star,
     ArrowLeft
 } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 const MyOrdersPage = () => {
     const [orders, setOrders] = useState([]);
@@ -36,7 +37,7 @@ const MyOrdersPage = () => {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/api/orders/my-orders', {
+            const response = await axios.get(API_ENDPOINTS.MY_ORDERS, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -64,7 +65,7 @@ const MyOrdersPage = () => {
     const checkCanReview = async (productId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`http://localhost:5000/api/reviews/can-review/${productId}`, {
+            const response = await axios.get(API_ENDPOINTS.CAN_REVIEW(productId), {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

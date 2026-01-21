@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products as fallbackProducts } from '../data/products';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -15,7 +16,7 @@ const Home = () => {
 
   const fetchFeaturedProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(API_ENDPOINTS.PRODUCTS);
       console.log('Fetched products:', response.data);
 
       if (response.data && response.data.length > 0) {

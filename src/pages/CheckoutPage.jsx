@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ const CheckoutPage = () => {
       console.log('Token:', token ? 'Token exists' : 'NO TOKEN!');
 
       // Send order to backend
-      const response = await axios.post('http://localhost:5000/api/orders', orderData, {
+      const response = await axios.post(API_ENDPOINTS.ORDERS, orderData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

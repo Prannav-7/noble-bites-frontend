@@ -4,6 +4,7 @@ import ProductCard from '../components/ProductCard';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { products as fallbackProducts } from '../data/products';
+import { API_ENDPOINTS } from '../config/api';
 
 const MenuPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +22,7 @@ const MenuPage = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/products');
+      const response = await axios.get(API_ENDPOINTS.PRODUCTS);
 
       if (response.data && response.data.length > 0) {
         // Use database products
@@ -82,8 +83,8 @@ const MenuPage = () => {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-6 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap ${selectedCategory === cat
-                  ? 'bg-brand-primary text-white shadow-md'
-                  : 'bg-white text-brand-text border border-brand-secondary/20 hover:bg-brand-light'
+                ? 'bg-brand-primary text-white shadow-md'
+                : 'bg-white text-brand-text border border-brand-secondary/20 hover:bg-brand-light'
                 }`}
             >
               {cat}
