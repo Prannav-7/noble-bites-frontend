@@ -94,15 +94,21 @@ src/
 
 ## 🗄 MongoDB Integration
 
-Your MongoDB connection string is configured for:
-\`\`\`
-mongodb+srv://prannavp803_db_user:mtVnZZ9smGHAB7HS@cluster0.gprfdbn.mongodb.net/
-\`\`\`
+**Status:** ✅ Connected to MongoDB Atlas  
+**Last Updated:** February 6, 2026
+
+The backend is now connected to MongoDB Atlas cluster with all data migrated successfully:
+- 12 Users
+- 18 Products  
+- 8 Orders
+- 3 Reviews
+- Wishlist data
 
 ### To Connect Backend:
 
 1. See `BACKEND_QUICKSTART.md` for step-by-step backend setup
 2. See `SETUP_GUIDE.md` for detailed MongoDB schema and API structure
+3. Backend is running on new MongoDB cluster (cluster0.9xaehox.mongodb.net)
 
 ## 📝 Configuration Files
 
