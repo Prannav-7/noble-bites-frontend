@@ -99,8 +99,8 @@ src/
 
 The backend is now connected to MongoDB Atlas cluster with all data migrated successfully:
 - 12 Users
-- 18 Products  
-- 8 Orders
+- 16 Products (verified)
+- 20 Orders
 - 3 Reviews
 - Wishlist data
 
