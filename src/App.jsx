@@ -5,6 +5,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import AboutPage from './pages/AboutPage';
+import ContactPage from './pages/ContactPage';
 import MenuPage from './pages/MenuPage';
 import CartPage from './pages/CartPage';
 import WishlistPage from './pages/WishlistPage';
@@ -32,7 +34,8 @@ function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/my-orders" element={<MyOrdersPage />} />
               <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/contact" element={<Home />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
             </Routes>
 
             {/* Simple Footer */}
