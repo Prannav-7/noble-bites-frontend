@@ -471,7 +471,15 @@ const AdminDashboard = () => {
                                                 <td className="px-4 py-3 text-sm font-mono">{order._id.slice(-8)}</td>
                                                 <td className="px-4 py-3 text-sm">{order.user?.name || 'N/A'}</td>
                                                 <td className="px-4 py-3 text-sm text-gray-600">{order.user?.email || 'N/A'}</td>
-                                                <td className="px-4 py-3 text-sm">{order.items.length} items</td>
+                                                <td className="px-4 py-3 text-sm">
+                                                    <div className="max-w-xs transition-all">
+                                                        {order.items.map((item, idx) => (
+                                                            <div key={idx} className="whitespace-nowrap overflow-hidden text-ellipsis text-xs" title={`${item.name} - ${item.quantity} x ${item.weight || 'unit'}`}>
+                                                                • {item.name}: {item.quantity} x {item.weight || 'unit'}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </td>
                                                 <td className="px-4 py-3 text-sm font-semibold">₹{order.finalAmount}</td>
                                                 <td className="px-4 py-3">
                                                     <select

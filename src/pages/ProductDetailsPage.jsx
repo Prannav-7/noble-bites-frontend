@@ -9,6 +9,7 @@ import AuthModal from '../components/AuthModal';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import { API_ENDPOINTS, getImageUrl } from '../config/api';
+import { parseWeight, calculateCustomPrice, isCustomizableWeight } from '../utils/weightUtils';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -28,6 +29,10 @@ const ProductDetailsPage = () => {
   const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [customWeightValue, setCustomWeightValue] = useState('');
+  const [customWeightUnit, setCustomWeightUnit] = useState('g');
+  const [displayPrice, setDisplayPrice] = useState(0);
+  const [isCustomizable, setIsCustomizable] = useState(false);
 
   const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useCart();
   const { isAuthenticated, user } = useAuth();
@@ -69,6 +74,34 @@ const ProductDetailsPage = () => {
       setLoading(false);
     }
   };
+
+  // Set initial custom weight when product loads
+  useEffect(() => {
+    if (product) {
+      const isCustomVal = isCustomizableWeight(product.weight);
+      setIsCustomizable(isCustomVal);
+      
+      if (isCustomVal) {
+        const parsed = parseWeight(product.weight);
+        setCustomWeightValue(parsed.value);
+        setCustomWeightUnit(parsed.unit);
+      }
+      setDisplayPrice(product.price);
+    }
+  }, [product]);
+
+  // Update dynamic price when weight changes
+  useEffect(() => {
+    if (product && isCustomizable && customWeightValue > 0) {
+      const newPrice = calculateCustomPrice(
+        product.price,
+        product.weight,
+        customWeightValue,
+        customWeightUnit
+      );
+      setDisplayPrice(newPrice);
+    }
+  }, [customWeightValue, customWeightUnit, product, isCustomizable]);
 
   useEffect(() => {
     if (product && isAuthenticated()) {
@@ -272,7 +305,6 @@ const ProductDetailsPage = () => {
       setPendingAction(null);
     }
   };
-
   const handleAddToCart = () => {
     if (!isAuthenticated()) {
       toast.error('Please login to continue');
@@ -280,7 +312,10 @@ const ProductDetailsPage = () => {
       setShowAuthModal(true);
       return;
     }
-    addToCart(product, quantity);
+    const weightInfo = isCustomizable 
+      ? { value: parseFloat(customWeightValue), unit: customWeightUnit }
+      : null;
+    addToCart(product, quantity, weightInfo);
   };
 
   const handleBuyNow = () => {
@@ -290,7 +325,10 @@ const ProductDetailsPage = () => {
       setShowAuthModal(true);
       return;
     }
-    addToCart(product, quantity);
+    const weightInfo = isCustomizable 
+      ? { value: parseFloat(customWeightValue), unit: customWeightUnit }
+      : null;
+    addToCart(product, quantity, weightInfo);
     navigate('/cart');
   };
 
@@ -364,7 +402,7 @@ const ProductDetailsPage = () => {
                     <span className="text-brand-text/60 text-sm">({reviews.length} reviews)</span>
                   </div>
                   <p className="text-2xl font-bold text-brand-text">
-                    Rs. {product.price} <span className="text-base font-normal text-brand-text/60">/ {product.weight}</span>
+                    Rs. {displayPrice} <span className="text-base font-normal text-brand-text/60">/ {isCustomizable ? `${customWeightValue}${customWeightUnit}` : product.weight}</span>
                   </p>
                 </div>
 
@@ -407,24 +445,45 @@ const ProductDetailsPage = () => {
                   )}
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center border border-brand-secondary/30 rounded-full bg-white">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-4 py-2 text-brand-primary hover:bg-brand-light rounded-l-full transition-colors"
-                    >
-                      -
-                    </button>
-                    <span className="px-4 font-bold text-brand-text w-12 text-center">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="px-4 py-2 text-brand-primary hover:bg-brand-light rounded-r-full transition-colors"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div className="text-sm text-brand-text/60">
-                    Total: <span className="font-bold text-brand-primary">Rs. {product.price * quantity}</span>
+                <div className="space-y-4">
+                  {isCustomizable && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-brand-primary uppercase tracking-wider block">Enter weight (in {customWeightUnit})</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          value={customWeightValue}
+                          onChange={(e) => setCustomWeightValue(e.target.value)}
+                          min="1"
+                          className="w-full px-4 py-3 rounded-xl border border-brand-secondary/30 focus:outline-none focus:ring-2 focus:ring-brand-primary bg-white font-bold"
+                          placeholder={`Enter ${customWeightUnit}`}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-brand-primary uppercase tracking-wider block">Quantity</label>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center border border-brand-secondary/30 rounded-full bg-white shadow-sm">
+                        <button
+                          onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                          className="px-4 py-2 text-brand-primary hover:bg-brand-light rounded-l-full transition-colors font-bold"
+                        >
+                          -
+                        </button>
+                        <span className="px-5 font-bold text-brand-text w-12 text-center">{quantity}</span>
+                        <button
+                          onClick={() => setQuantity(quantity + 1)}
+                          className="px-4 py-2 text-brand-primary hover:bg-brand-light rounded-r-full transition-colors font-bold"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="text-sm text-brand-text/60">
+                        Total: <span className="font-bold text-brand-primary text-xl">Rs. {Math.round(displayPrice * quantity * 100) / 100}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 

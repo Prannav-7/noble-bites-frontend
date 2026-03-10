@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { calculateCustomPrice } from '../utils/weightUtils';
 
 const CartContext = createContext();
 
@@ -41,41 +42,60 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('wishlist', JSON.stringify(wishlist));
     }, [wishlist]);
 
-    const addToCart = (product, quantity = 1) => {
+    const addToCart = (product, quantity = 1, customWeight = null) => {
         const productId = getProductId(product);
-        const existingItem = cartItems.find(item => getProductId(item) === productId);
+        const weightString = customWeight ? `${customWeight.value}${customWeight.unit}` : product.weight;
+        
+        // Find existing item with SAME product ID AND SAME weight
+        const existingItemIndex = cartItems.findIndex(item => 
+            getProductId(item) === productId && item.customWeight === weightString
+        );
 
-        if (existingItem) {
-            // Update quantity if item already exists
+        if (existingItemIndex > -1) {
             setCartItems(prevItems =>
-                prevItems.map(item =>
-                    getProductId(item) === productId
+                prevItems.map((item, index) =>
+                    index === existingItemIndex
                         ? { ...item, quantity: item.quantity + quantity }
                         : item
                 )
             );
             toast.success('Cart updated!');
         } else {
-            // Add new item to cart
-            setCartItems(prevItems => [...prevItems, { ...product, quantity }]);
+            // Calculate price for this specific weight if it's different from base
+            let price = product.price;
+            if (customWeight) {
+                price = calculateCustomPrice(product.price, product.weight, customWeight.value, customWeight.unit);
+            }
+
+            setCartItems(prevItems => [...prevItems, { 
+                ...product, 
+                quantity, 
+                price, // This is the price per unit of this weight
+                customWeight: weightString,
+                originalWeight: product.weight // keep track of base reference
+            }]);
             toast.success('Added to cart!');
         }
     };
 
-    const removeFromCart = (productId) => {
-        setCartItems(prevItems => prevItems.filter(item => getProductId(item) !== productId));
+    const removeFromCart = (productId, weightString) => {
+        setCartItems(prevItems => prevItems.filter(item => 
+            !(getProductId(item) === productId && item.customWeight === weightString)
+        ));
         toast.success('Removed from cart');
     };
 
-    const updateQuantity = (productId, quantity) => {
+    const updateQuantity = (productId, weightString, quantity) => {
         if (quantity < 1) {
-            removeFromCart(productId);
+            removeFromCart(productId, weightString);
             return;
         }
 
         setCartItems(prevItems =>
             prevItems.map(item =>
-                getProductId(item) === productId ? { ...item, quantity } : item
+                (getProductId(item) === productId && item.customWeight === weightString) 
+                    ? { ...item, quantity } 
+                    : item
             )
         );
     };

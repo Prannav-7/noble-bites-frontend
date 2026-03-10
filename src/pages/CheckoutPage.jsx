@@ -42,9 +42,10 @@ const CheckoutPage = () => {
       // Prepare order data matching backend schema
       const orderData = {
         items: cartItems.map(item => ({
-          product: item._id || item.id, // Handle both database (_id) and static (id) products
+          product: item._id || item.id,
           name: item.name,
           quantity: item.quantity,
+          weight: item.customWeight, // Added custom weight
           price: item.price,
           image: item.image
         })),
@@ -249,11 +250,11 @@ const CheckoutPage = () => {
 
               <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                 {cartItems.map((item) => (
-                  <div key={item._id || item.id} className="flex gap-3 items-center bg-white/10 p-3 rounded-lg">
+                  <div key={`${item._id || item.id}-${item.customWeight}`} className="flex gap-3 items-center bg-white/10 p-3 rounded-lg">
                     <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover bg-white" />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-sm truncate">{item.name}</h3>
-                      <p className="text-xs text-white/70">Qty: {item.quantity}</p>
+                      <p className="text-xs text-white/70">Qty: {item.quantity} ({item.customWeight})</p>
                     </div>
                     <p className="font-bold text-sm">Rs.{item.price * item.quantity}</p>
                   </div>
