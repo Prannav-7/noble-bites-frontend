@@ -38,6 +38,9 @@ export const API_ENDPOINTS = {
 
     // Upload
     UPLOAD_IMAGE: `${API_BASE_URL}/api/upload-image`,
+
+    // Contact
+    CONTACT: `${API_BASE_URL}/api/contact`,
 };
 
 // Helper function to get image URL

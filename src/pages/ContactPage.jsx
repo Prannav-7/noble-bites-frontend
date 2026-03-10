@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import toast from 'react-hot-toast';
+import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const fadeUp = {
     hidden: { opacity: 0, y: 40 },
@@ -17,7 +19,7 @@ const locations = [
         city: 'Ranipet',
         pincode: '631102',
         address: '14, Gandhi Nagar, Ranipet District',
-        phone: '+91 94881 10405',
+        phone: '+91 70109 84588',
         hours: 'Mon – Sat: 9 AM – 9 PM',
         emoji: '🏠',
     },
@@ -25,7 +27,7 @@ const locations = [
         city: 'Coimbatore',
         pincode: '641402',
         address: '78, RS Puram, Coimbatore District',
-        phone: '+91 94881 10406',
+        phone: '+91 70109 84588',
         hours: 'Mon – Sun: 8 AM – 10 PM',
         emoji: '🏪',
     },
@@ -33,7 +35,7 @@ const locations = [
         city: 'Chennai',
         pincode: '600001',
         address: '22, Anna Salai, Chennai District',
-        phone: '+91 94881 10407',
+        phone: '+91 70109 84588',
         hours: 'Mon – Sun: 9 AM – 11 PM',
         emoji: '🏬',
     },
@@ -76,11 +78,16 @@ const ContactPage = () => {
             return;
         }
         setSending(true);
-        // Simulate sending
-        await new Promise((r) => setTimeout(r, 1400));
-        setSending(false);
-        toast.success('Message sent! We\'ll get back to you within 24 hours. 🎉');
-        setForm({ name: '', email: '', subject: '', message: '' });
+        try {
+            await axios.post(API_ENDPOINTS.CONTACT, form);
+            toast.success('Message sent! We\'ll get back to you within 24 hours. 🎉');
+            setForm({ name: '', email: '', subject: '', message: '' });
+        } catch (error) {
+            console.error('Contact form error:', error);
+            toast.error(error.response?.data?.message || 'Failed to send message. Please try again later.');
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -125,8 +132,8 @@ const ContactPage = () => {
                         <p className="text-brand-text/60 mb-6">Reach us through any of the channels below. We typically respond within a few hours.</p>
 
                         {[
-                            { icon: Phone, label: 'Phone', value: '+91 94881 10405', sub: 'Mon–Sat, 9 AM–9 PM', color: 'bg-rose-50 text-rose-500' },
-                            { icon: Mail, label: 'Email', value: 'logeshofficial333@gmail.com', sub: 'We reply within 24 hrs', color: 'bg-blue-50 text-blue-500' },
+                            { icon: Phone, label: 'Phone & WhatsApp', value: '+91 70109 84588', sub: 'Mon–Sat, 9 AM–9 PM', color: 'bg-rose-50 text-rose-500' },
+                            { icon: Mail, label: 'Email', value: 'ran17062005@gmail.com', sub: 'We reply within 24 hrs', color: 'bg-blue-50 text-blue-500' },
                             { icon: Clock, label: 'Business Hours', value: 'Mon – Sun', sub: '8:00 AM – 10:00 PM', color: 'bg-amber-50 text-amber-500' },
                         ].map(({ icon: Icon, label, value, sub, color }) => (
                             <div key={label} className="flex items-start gap-4 bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">

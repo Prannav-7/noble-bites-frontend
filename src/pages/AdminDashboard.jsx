@@ -36,7 +36,7 @@ import {
 import { API_ENDPOINTS, getImageUrl } from '../config/api';
 
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
-const ADMIN_EMAILS = ['prannavp803@gmail.com', 'ran17062005@gmail.com'];
+const ADMIN_EMAILS = ['ran17062005@gmail.com'];
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();

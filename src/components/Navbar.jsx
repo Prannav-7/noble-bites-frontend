@@ -16,7 +16,7 @@ const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
 
   // Admin emails
-  const ADMIN_EMAILS = ['prannavp803@gmail.com', 'ran17062005@gmail.com'];
+  const ADMIN_EMAILS = ['ran17062005@gmail.com'];
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   const navLinks = [
