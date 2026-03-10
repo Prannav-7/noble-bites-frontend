@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import AuthModal from '../components/AuthModal';
 import toast from 'react-hot-toast';
 import axios from 'axios';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, getImageUrl } from '../config/api';
 
 const ProductDetailsPage = () => {
   const { id } = useParams();
@@ -327,7 +327,7 @@ const ProductDetailsPage = () => {
               >
                 <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl border-8 border-white bg-white">
                   <img
-                    src={product.image}
+                    src={product.image ? getImageUrl(product.image) : 'https://placehold.co/600x600'}
                     alt={product.name}
                     className="w-full h-full object-cover hover:scale-110 transition-transform duration-700"
                   />
@@ -638,7 +638,7 @@ const ProductDetailsPage = () => {
                     >
                       <div className="aspect-square overflow-hidden">
                         <img
-                          src={relatedProduct.image}
+                          src={relatedProduct.image ? getImageUrl(relatedProduct.image) : 'https://placehold.co/200x200'}
                           alt={relatedProduct.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />

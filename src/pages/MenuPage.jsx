@@ -122,8 +122,8 @@ const MenuPage = () => {
                 key={name}
                 onClick={() => setSelectedCategory(name)}
                 className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === name
-                    ? `bg-gradient-to-r ${color} text-white shadow-md scale-105`
-                    : 'bg-gray-100 text-brand-text hover:bg-gray-200'
+                  ? `bg-gradient-to-r ${color} text-white shadow-md scale-105`
+                  : 'bg-gray-100 text-brand-text hover:bg-gray-200'
                   }`}
               >
                 <Icon size={15} />

@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                 topRes
             ] = await Promise.all([
                 axios.get(API_ENDPOINTS.ADMIN_DASHBOARD_STATS, getAuthHeaders()),
-                axios.get(API_ENDPOINTS.ADMIN_PRODUCTS, getAuthHeaders()),
+                axios.get(`${API_ENDPOINTS.ADMIN_PRODUCTS}?limit=1000`, getAuthHeaders()),
                 axios.get(API_ENDPOINTS.ADMIN_RECENT_ORDERS(20), getAuthHeaders()),
                 axios.get(API_ENDPOINTS.ADMIN_MONTHLY_SALES, getAuthHeaders()),
                 axios.get(API_ENDPOINTS.ADMIN_WEEKLY_SALES, getAuthHeaders()),
@@ -392,7 +392,7 @@ const AdminDashboard = () => {
                                                 <tr key={product._id} className="hover:bg-gray-50">
                                                     <td className="px-4 py-3">
                                                         <img
-                                                            src={product.image}
+                                                            src={product.image ? getImageUrl(product.image) : 'https://placehold.co/48x48'}
                                                             alt={product.name}
                                                             className="w-12 h-12 object-cover rounded-lg"
                                                         />

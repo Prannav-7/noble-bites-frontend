@@ -1,6 +1,7 @@
 import React from 'react';
 import { Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getImageUrl } from '../config/api';
 
 const ProductCard = ({ product }) => {
   const productId = product._id || product.id;
@@ -13,7 +14,7 @@ const ProductCard = ({ product }) => {
       {/* Circle Image Container */}
       <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 mb-3 shadow-md bg-white shrink-0">
         <img
-          src={product.image || "https://img-wrapper.vercel.app/image?url=https://placehold.co/200x200"}
+          src={product.image ? getImageUrl(product.image) : "https://img-wrapper.vercel.app/image?url=https://placehold.co/200x200"}
           alt={product.name}
           className="w-full h-full object-cover"
         />
