@@ -39,7 +39,7 @@ const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'
 const ADMIN_EMAILS = ['prannavp803@gmail.com', 'ran17062005@gmail.com'];
 
 const AdminDashboard = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState('dashboard');
@@ -126,7 +126,13 @@ const AdminDashboard = () => {
             setLoading(false);
         } catch (error) {
             console.error('Failed to fetch dashboard data:', error);
-            toast.error('Failed to load dashboard data');
+            if (error.response?.status === 401) {
+                toast.error('Session expired. Please log in again.');
+                logout();
+                navigate('/login');
+            } else {
+                toast.error('Failed to load dashboard data');
+            }
             setLoading(false);
         }
     };
