@@ -46,12 +46,20 @@ const values = [
     },
 ];
 
-const timeline = [
-    { year: '1998', event: 'Noble Bites was founded in a small kitchen in Ranipet, Tamil Nadu.' },
-    { year: '2005', event: 'Expanded to Coimbatore with a dedicated production facility.' },
-    { year: '2012', event: 'Won the State Food Heritage Award for preserving traditional snack recipes.' },
-    { year: '2018', event: 'Launched our Chennai outlet and started serving across Tamil Nadu.' },
-    { year: '2023', event: 'Went online — bringing authentic Tamil flavours to doorsteps nationwide.' },
+const process = [
+    { step: '01', title: 'Source Fresh Ingredients', desc: 'We hand-pick the finest rice flour, jaggery, sesame seeds, and spices from trusted local farmers in Tamil Nadu every morning.', emoji: '🌾' },
+    { step: '02', title: 'Traditional Preparation', desc: 'Our experienced artisans prepare each batch using age-old family recipes — no shortcuts, no machinery for the critical steps.', emoji: '👩‍🍳' },
+    { step: '03', title: 'Hand-Crafted with Care', desc: 'Every murukku twisted by hand, every laddu rolled with love. Each snack is shaped individually to preserve its authentic character.', emoji: '🤲' },
+    { step: '04', title: 'Quality Check & Packaging', desc: 'Each batch is tasted and inspected before being packed in hygienic, eco-friendly packaging to preserve freshness and flavour.', emoji: '✅' },
+];
+
+const categories = [
+    { name: 'Murukku', desc: 'Crispy, hand-twisted spirals made from rice flour and seasoned with cumin, sesame & asafoetida.', emoji: '🌀', bg: 'from-amber-50 to-orange-50', border: 'border-amber-200' },
+    { name: 'Sweets', desc: 'Melt-in-mouth burfis, laddus, halwas and more — sweetened with jaggery or sugar the traditional way.', emoji: '🍮', bg: 'from-pink-50 to-rose-50', border: 'border-pink-200' },
+    { name: 'Biscuits', desc: 'Freshly baked nei biscuits, butter biscuits and ragi biscuits, rich in flavour and naturally crisp.', emoji: '🍪', bg: 'from-yellow-50 to-amber-50', border: 'border-yellow-200' },
+    { name: 'Candies & Mittai', desc: 'Traditional village-style candies — Kairu Mittai, Javvu Mittai, Jeera Mittai and more nostalgic favourites.', emoji: '🍬', bg: 'from-purple-50 to-pink-50', border: 'border-purple-200' },
+    { name: 'Mixture & Snacks', desc: 'Crunchy special mixture, omapodi, ribbon pakoda and kara sev — perfect tea-time companions.', emoji: '🥣', bg: 'from-green-50 to-teal-50', border: 'border-green-200' },
+    { name: 'Laddus & Urundai', desc: 'Boondhi laddu, rava laddu, ellu urundai and pottukadalai urundai — festive favourites for every occasion.', emoji: '⚽', bg: 'from-red-50 to-rose-50', border: 'border-red-200' },
 ];
 
 const AboutPage = () => {
@@ -194,9 +202,9 @@ const AboutPage = () => {
                 </div>
             </section>
 
-            {/* ── Timeline ── */}
+            {/* ── How We Make It ── */}
             <section className="py-24 px-4 bg-gradient-to-br from-[#FFF0F0] to-[#F9C8C8]">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <motion.div
                         variants={fadeUp}
                         initial="hidden"
@@ -205,40 +213,82 @@ const AboutPage = () => {
                         className="text-center mb-16"
                     >
                         <span className="inline-block px-4 py-1 bg-brand-primary/10 rounded-full text-brand-primary font-semibold text-sm mb-4">
-                            Our Journey
+                            From Kitchen to Doorstep
                         </span>
-                        <h2 className="font-heading text-4xl md:text-5xl font-bold text-brand-text">Milestones That Matter</h2>
+                        <h2 className="font-heading text-4xl md:text-5xl font-bold text-brand-text">How We Make Our Snacks</h2>
+                        <p className="text-brand-text/60 mt-3 max-w-xl mx-auto">Every bite you enjoy goes through a carefully crafted process rooted in tradition and honesty.</p>
                     </motion.div>
 
-                    <div className="relative">
-                        {/* vertical line */}
-                        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-brand-primary/20 -translate-x-1/2" />
-
-                        <div className="space-y-12">
-                            {timeline.map(({ year, event }, i) => (
-                                <motion.div
-                                    key={year}
-                                    custom={i}
-                                    variants={fadeUp}
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
-                                    className={`relative flex items-start gap-6 md:gap-0 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                                >
-                                    {/* Content box */}
-                                    <div className={`ml-16 md:ml-0 md:w-[calc(50%-3rem)] ${i % 2 === 0 ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}>
-                                        <div className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-shadow border border-brand-primary/10">
-                                            <span className="font-heading text-2xl font-bold text-brand-primary block mb-2">{year}</span>
-                                            <p className="text-brand-text/70 text-sm leading-relaxed">{event}</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Dot */}
-                                    <div className="absolute left-6 md:left-1/2 w-5 h-5 rounded-full bg-brand-primary border-4 border-white shadow-md -translate-x-1/2 top-6" />
-                                </motion.div>
-                            ))}
-                        </div>
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {process.map(({ step, title, desc, emoji }, i) => (
+                            <motion.div
+                                key={step}
+                                custom={i}
+                                variants={fadeUp}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                className="bg-white rounded-2xl p-7 shadow-md hover:shadow-xl border border-brand-primary/10 hover:-translate-y-2 transition-all duration-300 relative overflow-hidden"
+                            >
+                                <span className="absolute top-4 right-4 text-5xl opacity-10 font-heading font-bold text-brand-primary">{step}</span>
+                                <div className="text-4xl mb-4">{emoji}</div>
+                                <h3 className="font-heading text-lg font-bold text-brand-text mb-2">{title}</h3>
+                                <p className="text-brand-text/60 text-sm leading-relaxed">{desc}</p>
+                            </motion.div>
+                        ))}
                     </div>
+                </div>
+            </section>
+
+            {/* ── Product Categories ── */}
+            <section className="py-24 px-4 bg-white">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        variants={fadeUp}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="text-center mb-16"
+                    >
+                        <span className="inline-block px-4 py-1 bg-brand-primary/10 rounded-full text-brand-primary font-semibold text-sm mb-4">
+                            Explore Our Range
+                        </span>
+                        <h2 className="font-heading text-4xl md:text-5xl font-bold text-brand-text">What We Offer</h2>
+                        <p className="text-brand-text/60 mt-3 max-w-xl mx-auto">Over 80 authentic products across 6 delicious categories — all made fresh, all made with love.</p>
+                    </motion.div>
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {categories.map(({ name, desc, emoji, bg, border }, i) => (
+                            <motion.div
+                                key={name}
+                                custom={i}
+                                variants={fadeUp}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={{ once: true }}
+                                className={`bg-gradient-to-br ${bg} rounded-2xl p-7 border ${border} hover:shadow-lg hover:-translate-y-1 transition-all duration-300`}
+                            >
+                                <div className="text-5xl mb-4">{emoji}</div>
+                                <h3 className="font-heading text-xl font-bold text-brand-text mb-2">{name}</h3>
+                                <p className="text-brand-text/65 text-sm leading-relaxed">{desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    <motion.div
+                        variants={fadeUp}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true }}
+                        className="text-center mt-12"
+                    >
+                        <Link
+                            to="/menu"
+                            className="inline-flex items-center gap-2 bg-brand-primary text-white font-bold px-10 py-4 rounded-full shadow-lg hover:bg-[#7a2626] transition-all hover:-translate-y-0.5 text-lg"
+                        >
+                            Browse All Products →
+                        </Link>
+                    </motion.div>
                 </div>
             </section>
 

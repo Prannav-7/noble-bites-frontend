@@ -38,8 +38,25 @@ const Home = () => {
   const fetchFeaturedProducts = async () => {
     try {
       const response = await axios.get(API_ENDPOINTS.PRODUCTS);
-      const data = response.data;
-      setFeaturedProducts(data?.length > 0 ? data.slice(0, 4) : fallbackProducts.slice(0, 4));
+      const backendProducts = response.data || [];
+
+      if (backendProducts.length > 0) {
+        // Build backend map for merging
+        const backendMap = {};
+        backendProducts.forEach(p => { backendMap[p._id] = p; });
+
+        // Use local products as base (local images), merge live data
+        const merged = fallbackProducts.map(local => {
+          const live = backendMap[local.id];
+          if (live) {
+            return { ...local, price: live.price ?? local.price, rating: live.rating ?? local.rating };
+          }
+          return local;
+        });
+        setFeaturedProducts(merged.slice(0, 4));
+      } else {
+        setFeaturedProducts(fallbackProducts.slice(0, 4));
+      }
     } catch {
       setFeaturedProducts(fallbackProducts.slice(0, 4));
     }
