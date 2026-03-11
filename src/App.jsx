@@ -15,6 +15,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import AdminDashboard from './pages/AdminDashboard';
 import MyOrdersPage from './pages/MyOrdersPage';
 import ScrollToTop from './components/ScrollToTop';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -23,25 +24,24 @@ function App() {
         <Router>
           <ScrollToTop />
           <Toaster position="top-center" />
-          <div className="min-h-screen bg-brand-bg text-brand-text font-sans selection:bg-brand-secondary selection:text-white">
+          <div className="min-h-screen bg-brand-bg text-brand-text font-sans selection:bg-brand-secondary selection:text-white flex flex-col">
             <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/menu" element={<MenuPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/wishlist" element={<WishlistPage />} />
-              <Route path="/product/:id" element={<ProductDetailsPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/my-orders" element={<MyOrdersPage />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-            </Routes>
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/menu" element={<MenuPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/wishlist" element={<WishlistPage />} />
+                <Route path="/product/:id" element={<ProductDetailsPage />} />
+                <Route path="/checkout" element={<CheckoutPage />} />
+                <Route path="/my-orders" element={<MyOrdersPage />} />
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+              </Routes>
+            </main>
 
-            {/* Simple Footer */}
-            <footer className="bg-brand-primary text-white py-6 text-center text-sm">
-              <p>&copy; 2025 Noble Bites. All rights reserved.</p>
-            </footer>
+            <Footer />
           </div>
         </Router>
       </CartProvider>
