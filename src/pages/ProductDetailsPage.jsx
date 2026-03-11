@@ -45,31 +45,34 @@ const ProductDetailsPage = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(API_ENDPOINTS.PRODUCTS);
+      // Always find the local product first (has local bundled images)
+      const localProduct = products.find(p => p.id === id || p.id === parseInt(id));
 
-      if (response.data && response.data.length > 0) {
-        // Find product in database products
-        const foundProduct = response.data.find(p =>
-          p._id === id || p.id === parseInt(id) || p.id === id
-        );
+      try {
+        const response = await axios.get(API_ENDPOINTS.PRODUCTS);
+        const backendProducts = response.data || [];
+        const liveProduct = backendProducts.find(p => p._id === id || p._id?.toString() === id);
 
-        if (foundProduct) {
-          setProduct(foundProduct);
+        if (localProduct && liveProduct) {
+          // Merge: keep local image, override live business data
+          setProduct({
+            ...localProduct,
+            _id: liveProduct._id,
+            price: liveProduct.price ?? localProduct.price,
+            inStock: liveProduct.inStock ?? localProduct.inStock,
+            stockQuantity: liveProduct.stockQuantity ?? localProduct.stockQuantity,
+            rating: liveProduct.rating ?? localProduct.rating,
+          });
+        } else if (localProduct) {
+          setProduct(localProduct);
+        } else if (liveProduct) {
+          setProduct(liveProduct);
         } else {
-          // Fallback to static products
-          const staticProduct = products.find(p => p.id === parseInt(id));
-          setProduct(staticProduct);
+          setProduct(null);
         }
-      } else {
-        // Fallback to static products if DB is empty
-        const staticProduct = products.find(p => p.id === parseInt(id));
-        setProduct(staticProduct);
+      } catch {
+        setProduct(localProduct || null);
       }
-    } catch (error) {
-      console.error('Error fetching product:', error);
-      // Fallback to static products on error
-      const staticProduct = products.find(p => p.id === parseInt(id));
-      setProduct(staticProduct);
     } finally {
       setLoading(false);
     }
@@ -157,67 +160,32 @@ const ProductDetailsPage = () => {
 
   const fetchRelatedProducts = async () => {
     try {
-      // Fetch all products from database
-      const productsResponse = await axios.get(API_ENDPOINTS.PRODUCTS);
-      let allProducts = [];
+      const response = await axios.get(API_ENDPOINTS.PRODUCTS);
+      const backendProducts = response.data || [];
 
-      if (productsResponse.data && productsResponse.data.length > 0) {
-        allProducts = productsResponse.data;
-      } else {
-        allProducts = products; // Fallback to static products
-      }
+      // Build a map of backend data by _id for merging
+      const backendMap = {};
+      backendProducts.forEach(p => { backendMap[p._id] = p; });
 
-      const currentProductId = product._id || product.id;
-
-      if (isAuthenticated()) {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(API_ENDPOINTS.MY_ORDERS, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.data.success && response.data.orders.length > 0) {
-          // Get all purchased product IDs
-          const purchasedProductIds = new Set();
-          response.data.orders.forEach(order => {
-            order.items.forEach(item => {
-              purchasedProductIds.add(item.product);
-            });
-          });
-
-          // Find related products based on category and purchased history
-          const related = allProducts.filter(p => {
-            const pId = p._id || p.id;
-            return pId !== currentProductId &&
-              (p.category === product.category || purchasedProductIds.has(pId?.toString()));
-          }).slice(0, 4);
-
-          setRelatedProducts(related);
-        } else {
-          // Default: show products from same category
-          const related = allProducts.filter(p => {
-            const pId = p._id || p.id;
-            return pId !== currentProductId && p.category === product.category;
-          }).slice(0, 4);
-          setRelatedProducts(related);
+      // Use local products as the source (for images), merge backend data
+      const localWithImages = products.map(local => {
+        const live = backendMap[local.id];
+        if (live) {
+          return { ...local, _id: live._id, price: live.price ?? local.price, rating: live.rating ?? local.rating };
         }
-      } else {
-        // Default: show products from same category
-        const related = allProducts.filter(p => {
-          const pId = p._id || p.id;
-          return pId !== currentProductId && p.category === product.category;
-        }).slice(0, 4);
-        setRelatedProducts(related);
-      }
-    } catch (error) {
-      console.error('Error fetching related products:', error);
-      // Fallback to category-based related products from static data
+        return local;
+      });
+
       const currentProductId = product._id || product.id;
-      const related = products.filter(p => {
-        const pId = p._id || p.id;
-        return pId !== currentProductId && p.category === product.category;
-      }).slice(0, 4);
+      const related = localWithImages
+        .filter(p => (p._id || p.id) !== currentProductId && p.category === product.category)
+        .slice(0, 4);
+      setRelatedProducts(related);
+    } catch {
+      const currentProductId = product._id || product.id;
+      const related = products
+        .filter(p => (p._id || p.id) !== currentProductId && p.category === product.category)
+        .slice(0, 4);
       setRelatedProducts(related);
     }
   };

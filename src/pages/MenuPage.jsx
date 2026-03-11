@@ -33,7 +33,32 @@ const MenuPage = () => {
     try {
       setLoading(true);
       const response = await axios.get(API_ENDPOINTS.PRODUCTS);
-      setProducts(response.data?.length ? response.data : fallbackProducts);
+      const backendProducts = response.data || [];
+
+      if (backendProducts.length > 0) {
+        // Merge: use local products as base (for local images), 
+        // overlay live data (price, stock, rating) from backend by matching id
+        const backendMap = {};
+        backendProducts.forEach(p => {
+          backendMap[p._id] = p;
+        });
+        const merged = fallbackProducts.map(local => {
+          const live = backendMap[local.id];
+          if (live) {
+            return {
+              ...local,
+              price: live.price ?? local.price,
+              inStock: live.inStock ?? local.inStock,
+              stockQuantity: live.stockQuantity ?? local.stockQuantity,
+              rating: live.rating ?? local.rating,
+            };
+          }
+          return local;
+        });
+        setProducts(merged);
+      } else {
+        setProducts(fallbackProducts);
+      }
     } catch {
       setProducts(fallbackProducts);
     } finally {

@@ -46,7 +46,8 @@ export const API_ENDPOINTS = {
 // Helper function to get image URL
 export const getImageUrl = (path) => {
     if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    // Already an absolute URL (http/https) or a local bundled asset (starts with /) or data URL
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('/') || path.startsWith('data:')) {
         return path;
     }
     return `${API_BASE_URL}${path}`;
