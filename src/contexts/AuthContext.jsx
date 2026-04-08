@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
+import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
 
@@ -16,6 +17,35 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // ── Helper: clear all auth data ──
+    const clearAuth = () => {
+        setUser(null);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+    };
+
+    // ── Global Axios interceptor: auto-logout on expired token ──
+    useEffect(() => {
+        const interceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                const data = error.response?.data;
+                // If server explicitly says the token has expired, log the user out
+                if (error.response?.status === 401 && data?.expired === true) {
+                    clearAuth();
+                    toast.error('Your session has expired. Please log in again.', {
+                        id: 'session-expired', // prevent duplicate toasts
+                        duration: 4000,
+                    });
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        // Clean up interceptor when the provider unmounts
+        return () => axios.interceptors.response.eject(interceptor);
+    }, []);
+
     useEffect(() => {
         // Check if user is already logged in
         const storedUser = localStorage.getItem('user');
@@ -24,6 +54,7 @@ export const AuthProvider = ({ children }) => {
         }
         setLoading(false);
     }, []);
+
 
     const login = async (email, password) => {
         try {
@@ -61,9 +92,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
+        clearAuth();
     };
 
     const isAuthenticated = () => {
